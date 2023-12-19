@@ -4,24 +4,46 @@ import { useDevices } from '@/hooks/useDevices';
 import { TOPICS } from '@/lib/constants';
 import Container from '@/components/global/container';
 import Header from '@/components/global/header';
+import Device from '@/components/cards/device';
+import NoDevice from '@/components/cards/no-device';
 
 export default function Main(props: Props) {
   const socket = useContext(WsContext);
-  const { data: devices } = useDevices();
+  const { data: devices, isLoading, refetch } = useDevices();
 
   useEffect(() => {
     for (const device of devices) {
-      socket?.emit('mqtt:subscribe', `${TOPICS.I_PRESS}:${device.device_key}`);
-      socket?.emit('mqtt:subscribe', `${TOPICS.A_RING}:${device.device_key}`);
-      socket?.emit('mqtt:subscribe', `${TOPICS.B_SYNC}:${device.device_key}`);
-      socket?.emit('mqtt:subscribe', `${TOPICS.I_SYNC}:${device.device_key}`);
-      socket?.emit('mqtt:subscribe', `${TOPICS.A_SYNC}:${device.device_key}`);
+      for (const topic in TOPICS) {
+        socket?.emit('mqtt:subscribe', `${topic}:${device.deviceKey}`);
+      }
     }
-  }, [socket, devices]);
+  }, [devices, socket]);
+
+  useEffect(() => {
+    const callback = (data: MqttMessage) => {
+      if (data.topic.parsed === TOPICS.A_SYNC) return refetch();
+    };
+
+    socket?.on('mqtt:message', callback);
+
+    return () => {
+      socket?.off('mqtt:message', callback);
+    };
+  }, [socket, refetch]);
 
   return (
     <Container>
-      <Header {...props} />
+      <Header
+        user={props.user}
+        refetchUser={props.refetch}
+        refetchDevices={refetch}
+      />
+      <div className='p-4'>
+        {!isLoading && devices.length < 1 && <NoDevice />}
+        {devices.map((device) => (
+          <Device key={device.id} device={device} refetch={refetch} />
+        ))}
+      </div>
     </Container>
   );
 }

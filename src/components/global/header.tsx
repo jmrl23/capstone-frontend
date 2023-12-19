@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { request } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import toast from 'react-hot-toast';
+import DeviceBindDialog from '@/components/dialogs/device-bind';
 
 export default function Header(props: Props) {
   const handleLogout = async () => {
@@ -18,7 +19,8 @@ export default function Header(props: Props) {
 
     if (data instanceof Error) return toast.error(data.message);
 
-    props.refetch();
+    props.refetchUser();
+    toast.success('Logged out');
   };
 
   return (
@@ -37,12 +39,18 @@ export default function Header(props: Props) {
           {props.user.UserAuth.username}
         </span>
       </div>
-      <Button onClick={handleLogout}>Logout</Button>
+      <div className='flex gap-x-4'>
+        <DeviceBindDialog refetch={props.refetchDevices} />
+        <Button variant={'secondary'} onClick={handleLogout} title='Logout'>
+          Logout
+        </Button>
+      </div>
     </header>
   );
 }
 
 export interface Props {
   user: User;
-  refetch: () => void;
+  refetchUser: () => void;
+  refetchDevices: () => void;
 }

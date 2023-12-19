@@ -50,6 +50,7 @@ export default function Register() {
     if (data instanceof Error) return toast.error(data.message);
 
     toast.success('Registered successfully!');
+    form.reset();
   };
 
   return (

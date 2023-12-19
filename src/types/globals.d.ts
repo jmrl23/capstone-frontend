@@ -18,14 +18,22 @@ export declare global {
     id: string;
     createdAt: Date;
     updatedAt: Date;
-    device_key: string;
+    deviceKey: string;
     userId: string;
     deviceId: string;
     DeviceData: {
       isRinging: boolean;
-      DeviceDataPress: {
-        createdAt: Date;
-      }[];
+      DeviceDataPress: Array<{ createdAt: Date }>;
     };
+  }
+
+  export declare interface MqttMessage {
+    timestamp: number;
+    message: string;
+    topic: {
+      parsed: string;
+      raw: string;
+    };
+    device: Device;
   }
 }

@@ -50,6 +50,7 @@ export default function Login(props: Props) {
     if (data instanceof Error) return toast.error(data.message);
 
     props.refetch();
+    toast.success('Logged in');
   };
 
   return (

@@ -12,3 +12,7 @@ export const registerFormSchema = z.object({
     .toLowerCase(),
   password: z.string().min(5, 'Password must contain at least 1 character(s)'),
 });
+
+export const deviceBindSchema = z.object({
+  key: z.string().min(5, 'Device key must contain at least 5 character(s)'),
+});

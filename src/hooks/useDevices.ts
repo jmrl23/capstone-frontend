@@ -13,7 +13,7 @@ export function useDevices() {
   });
 
   const devices = data instanceof Error ? [] : data?.devices ?? [];
-  console.log(devices);
+
   return {
     data: devices,
     isLoading,
