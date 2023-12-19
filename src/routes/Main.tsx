@@ -6,6 +6,7 @@ import Container from '@/components/global/container';
 import Header from '@/components/global/header';
 import Device from '@/components/cards/device';
 import NoDevice from '@/components/cards/no-device';
+import Loading from '@/routes/Loading';
 
 export default function Main(props: Props) {
   const socket = useContext(WsContext);
@@ -31,6 +32,8 @@ export default function Main(props: Props) {
     };
   }, [socket, refetch]);
 
+  if (isLoading) return <Loading />;
+
   return (
     <Container>
       <Header
@@ -39,7 +42,7 @@ export default function Main(props: Props) {
         refetchDevices={refetch}
       />
       <div className='p-4'>
-        {!isLoading && devices.length < 1 && <NoDevice />}
+        {devices.length < 1 && <NoDevice />}
         {devices.map((device) => (
           <Device key={device.id} device={device} refetch={refetch} />
         ))}

@@ -18,9 +18,9 @@ export default function NoDevice() {
         You can start adding your device by pressing the{' '}
         <span className='bg-gray-100 p-2 rounded'>
           <PlugIcon className='inline-block' />
-          connect botton
-        </span>
-        .
+          connect
+        </span>{' '}
+        button.
       </CardContent>
     </Card>
   );
