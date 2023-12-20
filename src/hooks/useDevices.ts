@@ -1,7 +1,9 @@
 import { request } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
+import { useHax } from '@/hooks/useHax';
 
 export function useDevices() {
+  const hax = useHax();
   const { data, isLoading, refetch, isFetching, error } = useQuery({
     queryKey: ['device', 'list'],
     queryFn: () =>
@@ -9,6 +11,7 @@ export function useDevices() {
         fetch(`${import.meta.env.VITE_BACKEND_URL}/device/list`, {
           credentials: 'include',
           cache: 'no-cache',
+          headers: { ...hax.value },
         }),
       ),
   });

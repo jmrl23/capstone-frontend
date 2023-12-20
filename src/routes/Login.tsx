@@ -17,8 +17,10 @@ import { Link } from 'react-router-dom';
 import { request } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
+import { useHax } from '@/hooks/useHax';
 
 export default function Login(props: Props) {
+  const hax = useHax();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -32,8 +34,9 @@ export default function Login(props: Props) {
 
     const loadingToast = toast.loading('Logging in..');
     setIsLoading(true);
+    hax.reset();
 
-    const data = await request<{ user: User }>(
+    const data = await request<{ cid: string }>(
       fetch(`${import.meta.env.VITE_BACKEND_URL}/user/login`, {
         method: 'POST',
         credentials: 'include',
@@ -49,6 +52,7 @@ export default function Login(props: Props) {
 
     if (data instanceof Error) return toast.error(data.message);
 
+    hax.setValue(data.cid);
     props.refetch();
     toast.success('Logged in');
   };

@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { request } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useHax } from '@/hooks/useHax';
 import toast from 'react-hot-toast';
 import DeviceBindDialog from '@/components/dialogs/device-bind';
 
 export default function Header(props: Props) {
+  const hax = useHax();
   const handleLogout = async () => {
     const loadingToast = toast.loading('Logging out..');
 
@@ -12,13 +14,14 @@ export default function Header(props: Props) {
       fetch(`${import.meta.env.VITE_BACKEND_URL}/user/logout`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: { ...hax.value },
       }),
     );
 
     toast.dismiss(loadingToast);
 
     if (data instanceof Error) return toast.error(data.message);
-
+    hax.reset();
     props.refetchUser();
     toast.success('Logged out');
   };

@@ -12,9 +12,11 @@ import { UnplugIcon } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { request } from '@/lib/utils';
+import { useHax } from '@/hooks/useHax';
 
 export default function DeviceUnbindDialog({ device, refetch }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const hax = useHax();
 
   const handleConfirm = async () => {
     const loadingToast = toast.loading('Removing..');
@@ -24,6 +26,7 @@ export default function DeviceUnbindDialog({ device, refetch }: Props) {
         {
           method: 'DELETE',
           credentials: 'include',
+          headers: { ...hax.value },
         },
       ),
     );

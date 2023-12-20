@@ -26,8 +26,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { request } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { useHax } from '@/hooks/useHax';
 
 export default function DeviceBindDialog({ refetch }: Props) {
+  const hax = useHax();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const form = useForm<z.infer<typeof deviceBindSchema>>({
     resolver: zodResolver(deviceBindSchema),
@@ -50,6 +52,7 @@ export default function DeviceBindDialog({ refetch }: Props) {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...hax.value,
         },
         body: JSON.stringify({
           device_key: formData.key,
