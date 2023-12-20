@@ -9,7 +9,7 @@ export default function Header(props: Props) {
     const loadingToast = toast.loading('Logging out..');
 
     const data = await request<{ success: boolean }>(
-      fetch('/api/user/logout', {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/user/logout`, {
         method: 'DELETE',
         credentials: 'include',
       }),
