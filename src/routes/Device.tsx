@@ -1,5 +1,5 @@
 import Loading from '@/routes/Loading';
-import NotFound from './Notfound';
+import NotFound from '@/routes/Notfound';
 import Container from '@/components/global/container';
 import { useDevices } from '@/hooks/useDevices';
 import { Link, useParams } from 'react-router-dom';

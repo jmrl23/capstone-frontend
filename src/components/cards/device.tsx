@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 import { useContext } from 'react';
 import { WsContext } from '@/contexts/ws';
 import { TOPICS } from '@/lib/constants';
-import DeviceUnbindDialog from '../dialogs/device-unbind';
 import { Link } from 'react-router-dom';
+import DeviceUnbindDialog from '@/components/dialogs/device-unbind';
 
 export default function Device({ device, refetch }: Props) {
   const socket = useContext(WsContext);

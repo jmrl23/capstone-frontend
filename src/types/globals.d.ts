@@ -1,8 +1,8 @@
 export declare global {
   export declare interface User {
     id: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     userAuthId: string;
     userInformationId: string;
     UserAuth: {
@@ -16,14 +16,14 @@ export declare global {
 
   export declare interface Device {
     id: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     deviceKey: string;
     userId: string;
     deviceId: string;
     DeviceData: {
       isRinging: boolean;
-      DeviceDataPress: Array<{ createdAt: Date }>;
+      DeviceDataPress: Array<{ createdAt: string }>;
     };
   }
 

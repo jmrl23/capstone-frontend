@@ -36,7 +36,8 @@ export default function Header(props: Props) {
           </AvatarFallback>
         </Avatar>
         <span className='font-extrabold text-sm'>
-          {props.user.UserAuth.username}
+          {props.user.UserInformation.displayName ??
+            props.user.UserAuth.username}
         </span>
       </div>
       <div className='flex gap-x-4'>
