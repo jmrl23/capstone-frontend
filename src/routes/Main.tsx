@@ -1,20 +1,24 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { WsContext } from '@/contexts/ws';
 import { useDevices } from '@/hooks/useDevices';
-import { TOPICS } from '@/lib/constants';
-import Container from '@/components/global/container';
-import Header from '@/components/global/header';
-import Device from '@/components/cards/device';
-import NoDevice from '@/components/cards/no-device';
+import { NavigationContents, MqttTopics } from '@/lib/constants';
+import Container from '@/components/globals/container';
+import Header from '@/components/globals/header';
 import Loading from '@/routes/Loading';
+import Navigation from '@/components/globals/navigation';
+import Devices from '@/components/contents/devices';
+import Learn from '@/components/contents/learn';
 
 export default function Main(props: Props) {
+  const [content, setContent] = useState<NavigationContents>(
+    NavigationContents.devices,
+  );
   const socket = useContext(WsContext);
   const { data: devices, isLoading, refetch } = useDevices();
 
   useEffect(() => {
     for (const device of devices) {
-      for (const topic in TOPICS) {
+      for (const topic in MqttTopics) {
         socket?.emit('mqtt:subscribe', `${topic}:${device.deviceKey}`);
       }
     }
@@ -22,7 +26,7 @@ export default function Main(props: Props) {
 
   useEffect(() => {
     const callback = (data: MqttMessage) => {
-      if (data.topic.parsed === TOPICS.A_SYNC) return refetch();
+      if (data.topic.parsed === MqttTopics.A_SYNC) return refetch();
     };
 
     socket?.on('mqtt:message', callback);
@@ -41,12 +45,13 @@ export default function Main(props: Props) {
         refetchUser={props.refetch}
         refetchDevices={refetch}
       />
-      <div className='p-4'>
-        {devices.length < 1 && <NoDevice />}
-        {devices.map((device) => (
-          <Device key={device.id} device={device} refetch={refetch} />
-        ))}
+      <div className='p-4 mb-14'>
+        {content === NavigationContents.devices && (
+          <Devices devices={devices} refetch={refetch} />
+        )}
+        {content === NavigationContents.learn && <Learn />}
       </div>
+      <Navigation setContent={setContent} />
     </Container>
   );
 }

@@ -1,6 +1,6 @@
 import Loading from '@/routes/Loading';
 import NotFound from '@/routes/Notfound';
-import Container from '@/components/global/container';
+import Container from '@/components/globals/container';
 import { useDevices } from '@/hooks/useDevices';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { default as moment } from 'moment';
 import { Bar, ResponsiveContainer, XAxis, YAxis, BarChart } from 'recharts';
 import { useContext, useEffect } from 'react';
 import { WsContext } from '@/contexts/ws';
-import { TOPICS } from '@/lib/constants';
+import { MqttTopics } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -41,7 +41,7 @@ export default function Device() {
 
   useEffect(() => {
     const callback = (data: MqttMessage) => {
-      if (data.topic.parsed === TOPICS.A_SYNC) return refetch();
+      if (data.topic.parsed === MqttTopics.A_SYNC) return refetch();
     };
 
     socket?.on('mqtt:message', callback);

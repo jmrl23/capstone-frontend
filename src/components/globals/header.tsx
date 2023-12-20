@@ -27,7 +27,7 @@ export default function Header(props: Props) {
   };
 
   return (
-    <header className='shadow rounded-b-lg flex justify-between items-center p-4 mx-4'>
+    <header className='shadow rounded-b-lg flex justify-between items-center p-4 mx-4 bg-background'>
       <div className='flex items-center gap-x-2'>
         <Avatar>
           <AvatarImage

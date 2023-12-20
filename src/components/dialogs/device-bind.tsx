@@ -101,7 +101,11 @@ export default function DeviceBindDialog({ refetch }: Props) {
             />
             <DialogFooter className='gap-x-4 gap-y-2 mt-2'>
               <Button type='submit'>Confirm</Button>
-              <Button variant={'secondary'} onClick={() => setIsOpen(false)}>
+              <Button
+                type='button'
+                variant={'secondary'}
+                onClick={() => setIsOpen(false)}
+              >
                 Cancel
               </Button>
             </DialogFooter>

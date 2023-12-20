@@ -11,7 +11,7 @@ import { BarChart4Icon, BellRingIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useContext } from 'react';
 import { WsContext } from '@/contexts/ws';
-import { TOPICS } from '@/lib/constants';
+import { MqttTopics } from '@/lib/constants';
 import { Link } from 'react-router-dom';
 import DeviceUnbindDialog from '@/components/dialogs/device-unbind';
 
@@ -40,7 +40,7 @@ export default function Device({ device, refetch }: Props) {
             onClick={() =>
               socket?.emit(
                 'mqtt:publish',
-                `${TOPICS.A_RING}:${device.deviceKey}`,
+                `${MqttTopics.A_RING}:${device.deviceKey}`,
                 device.DeviceData.isRinging ? 'OFF' : 'ON',
               )
             }

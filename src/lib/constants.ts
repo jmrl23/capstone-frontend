@@ -5,7 +5,7 @@
 // B = both
 // I = iot
 // A = app
-export enum TOPICS {
+export enum MqttTopics {
   // pressing the button on iot
   I_PRESS = 'I_PRESS',
 
@@ -24,4 +24,9 @@ export enum TOPICS {
   // make a request which will revalidate the
   // list of devices and their informations
   A_SYNC = 'A_SYNC',
+}
+
+export enum NavigationContents {
+  learn,
+  devices,
 }
