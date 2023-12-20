@@ -6,8 +6,9 @@ export function useDevices() {
     queryKey: ['device', 'list'],
     queryFn: () =>
       request<{ devices: Device[] }>(
-        fetch('/api/device/list', {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/device/list`, {
           credentials: 'include',
+          cache: 'no-cache',
         }),
       ),
   });

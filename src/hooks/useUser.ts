@@ -6,8 +6,9 @@ export function useUser() {
     queryKey: ['user', 'session'],
     queryFn: () =>
       request<{ user: User | null }>(
-        fetch('/api/user/session', {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/user/session`, {
           credentials: 'include',
+          cache: 'no-cache',
         }),
       ),
   });

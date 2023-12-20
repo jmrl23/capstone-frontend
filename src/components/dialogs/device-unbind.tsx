@@ -19,10 +19,13 @@ export default function DeviceUnbindDialog({ device, refetch }: Props) {
   const handleConfirm = async () => {
     const loadingToast = toast.loading('Removing..');
     const data = await request(
-      fetch(`/api/device/unregister/${device.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      }),
+      fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/device/unregister/${device.id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        },
+      ),
     );
 
     toast.dismiss(loadingToast);

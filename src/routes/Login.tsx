@@ -34,7 +34,7 @@ export default function Login(props: Props) {
     setIsLoading(true);
 
     const data = await request<{ user: User }>(
-      fetch('/api/user/login', {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/user/login`, {
         method: 'POST',
         credentials: 'include',
         headers: {

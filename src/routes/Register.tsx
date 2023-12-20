@@ -34,7 +34,7 @@ export default function Register() {
     setIsLoading(true);
 
     const data = await request<{ user: User }>(
-      fetch('/api/user/register', {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/user/register`, {
         method: 'POST',
         credentials: 'include',
         headers: {

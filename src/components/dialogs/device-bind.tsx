@@ -45,7 +45,7 @@ export default function DeviceBindDialog({ refetch }: Props) {
   const onSubmit = async (formData: z.infer<typeof deviceBindSchema>) => {
     const loadingToast = toast.loading('Connecting..');
     const data = await request(
-      fetch('/api/device/register', {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/device/register`, {
         method: 'POST',
         credentials: 'include',
         headers: {
