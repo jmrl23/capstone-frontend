@@ -44,7 +44,7 @@ export default function Device() {
       if (data.topic.parsed === TOPICS.A_SYNC) return refetch();
     };
 
-    socket?.on('mqtt:message', () => {});
+    socket?.on('mqtt:message', callback);
     return () => {
       socket?.off('mqtt:message', callback);
     };
