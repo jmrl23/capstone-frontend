@@ -6,7 +6,16 @@ import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon } from 'lucide-react';
 import { default as moment } from 'moment';
-import { Bar, ResponsiveContainer, XAxis, YAxis, BarChart } from 'recharts';
+import {
+  Bar,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  BarChart,
+  Cell,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
 import { useContext, useEffect } from 'react';
 import { WsContext } from '@/contexts/ws';
 import { MqttTopics } from '@/lib/constants';
@@ -68,41 +77,99 @@ export default function Device() {
           </div>
         </div>
       </header>
-      <main className='m-4'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Usage</CardTitle>
-            <CardDescription>
-              Number of presses for the last 5 months
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width='100%' height={250}>
-              <BarChart data={usage}>
-                <XAxis
-                  dataKey='name'
-                  className='stroke-muted-foreground'
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  className='stroke-muted-foreground'
-                  fontSize={12}
-                  tickLine={true}
-                  axisLine={false}
-                  tickFormatter={(value) => value}
-                />
-                <Bar
-                  dataKey='total'
-                  className='fill-foreground'
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </main>
+      <UsageGraph data={usage} />
     </Container>
+  );
+}
+
+function UsageGraph({
+  data,
+}: {
+  data?: {
+    name: string;
+    total: number;
+  }[];
+}) {
+  const status = [
+    {
+      fill: 'green',
+      min: 0,
+      name: 'normal',
+    },
+    {
+      fill: 'yellow',
+      min: 100,
+      name: 'warning',
+    },
+    {
+      fill: 'red',
+      min: 200,
+      name: 'danger',
+    },
+  ];
+
+  const getStatusFill = (n: number): string => {
+    let fill = status[0].fill;
+
+    for (const e of status) {
+      if (n >= e.min) {
+        fill = e.fill;
+      }
+    }
+
+    return fill;
+  };
+
+  return (
+    <div className='m-4'>
+      <Card>
+        <CardHeader>
+          <CardTitle>Usage</CardTitle>
+          <CardDescription>
+            Number of presses for the last 5 months
+            <br />
+            <div className='flex flex-col gap-y-2 my-2'>
+              {status.map((e, i) => (
+                <div className='flex gap-x-2 items-center'>
+                  <div
+                    key={i}
+                    className='w-4 h-4'
+                    style={{ backgroundColor: e.fill }}
+                  />
+                  <span>{e.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width='100%' height={250}>
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis
+                dataKey='name'
+                className='stroke-muted-foreground'
+                fontSize={12}
+                tickLine={false}
+                axisLine={true}
+              />
+              <YAxis
+                className='stroke-muted-foreground'
+                fontSize={12}
+                tickLine={true}
+                axisLine={true}
+                tickFormatter={(value) => value}
+              />
+              <Tooltip />
+              <Bar dataKey='total' radius={[2, 2, 0, 0]}>
+                {data?.map(({ total, name }) => (
+                  <Cell key={name} fill={getStatusFill(total)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
