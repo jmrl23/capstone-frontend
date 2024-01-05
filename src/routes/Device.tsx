@@ -127,20 +127,21 @@ function UsageGraph({
           <CardTitle>Usage</CardTitle>
           <CardDescription>
             Number of presses for the last 5 months
-            <br />
-            <div className='flex flex-col gap-y-2 my-2'>
-              {status.map((e, i) => (
-                <div className='flex gap-x-2 items-center'>
-                  <div
-                    key={i}
-                    className='w-4 h-4'
-                    style={{ backgroundColor: e.fill }}
-                  />
-                  <span>{e.name}</span>
-                </div>
-              ))}
-            </div>
           </CardDescription>
+          <div className='flex flex-col gap-y-2 my-2 text-sm text-gray-600 items-end'>
+            {status.map((e, i) => (
+              <div
+                className='flex gap-x-2 justify-between items-center w-[80px]'
+                key={i}
+              >
+                <div
+                  className='w-4 h-4 rounded'
+                  style={{ backgroundColor: e.fill }}
+                />
+                <span className='font-bold'>{e.name}</span>
+              </div>
+            ))}
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width='100%' height={250}>
