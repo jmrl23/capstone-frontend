@@ -27,6 +27,11 @@ export declare global {
     };
   }
 
+  export declare interface DeviceDataPress {
+    id: string;
+    createdAt: string;
+  }
+
   export declare interface MqttMessage {
     timestamp: number;
     message: string;

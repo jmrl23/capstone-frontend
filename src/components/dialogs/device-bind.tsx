@@ -83,7 +83,7 @@ export default function DeviceBindDialog({ refetch }: Props) {
             <DialogHeader>
               <DialogTitle>Connect device</DialogTitle>
               <DialogDescription>
-                Add new device to this account
+                Add new device to your account
               </DialogDescription>
             </DialogHeader>
             <FormField
