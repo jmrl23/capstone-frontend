@@ -163,7 +163,7 @@ function UsageGraph({
           <CardDescription>
             Number of presses for the last 5 months
           </CardDescription>
-          <div className='flex flex-col gap-y-2 my-2 text-xs text-gray-600 items-end'>
+          <div className='flex flex-col gap-y-2 mt-4 text-xs text-gray-600 items-end'>
             {status.map((e, i) => (
               <div
                 className='flex gap-x-2 justify-between items-center w-[80px]'
@@ -227,7 +227,7 @@ function LogsTable({
           <CardDescription>View usage log on a date range</CardDescription>
         </CardHeader>
         <DatePickerWithRange className='m-4' date={date} setDate={setDate} />
-        <p className='p-4 text-right font-bold gray-600 text-xs'>
+        <p className='p-4 text-right font-bold text-gray-600 text-xs'>
           Total: {data.length}
         </p>
         <Table>
