@@ -129,17 +129,17 @@ function UsageGraph({
     {
       fill: 'green',
       min: 0,
-      name: 'normal',
+      name: 'Mild',
     },
     {
-      fill: 'yellow',
-      min: 100,
-      name: 'warning',
+      fill: 'orange',
+      min: 11,
+      name: 'Moderate',
     },
     {
       fill: 'red',
-      min: 200,
-      name: 'danger',
+      min: 31,
+      name: 'Severe',
     },
   ];
 
@@ -163,7 +163,7 @@ function UsageGraph({
           <CardDescription>
             Number of presses for the last 5 months
           </CardDescription>
-          <div className='flex flex-col gap-y-2 mt-4 text-xs text-gray-600 items-end'>
+          <div className='flex flex-col gap-y-2 pt-4 text-xs text-gray-600 items-end'>
             {status.map((e, i) => (
               <div
                 className='flex gap-x-2 justify-between items-center w-[80px]'
