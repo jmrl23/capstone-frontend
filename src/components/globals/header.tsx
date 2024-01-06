@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useHax } from '@/hooks/useHax';
 import toast from 'react-hot-toast';
 import DeviceBindDialog from '@/components/dialogs/device-bind';
+import { Link } from 'react-router-dom';
 
 export default function Header(props: Props) {
   const hax = useHax();
@@ -28,21 +29,23 @@ export default function Header(props: Props) {
 
   return (
     <header className='shadow rounded-b-lg flex justify-between items-center p-4 mx-4 bg-background'>
-      <div className='flex items-center gap-x-2'>
-        <Avatar>
-          <AvatarImage
-            src={props.user.UserInformation.imageUrl ?? ''}
-            alt='@shadcn'
-          />
-          <AvatarFallback>
-            {props.user.UserAuth.username.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <span className='font-extrabold text-sm'>
-          {props.user.UserInformation.displayName ??
-            props.user.UserAuth.username}
-        </span>
-      </div>
+      <Link to={'/profile'}>
+        <div className='flex items-center gap-x-2'>
+          <Avatar>
+            <AvatarImage
+              src={props.user.UserInformation.imageUrl ?? ''}
+              alt={props.user.UserAuth.username}
+            />
+            <AvatarFallback>
+              {props.user.UserAuth.username.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <span className='font-extrabold text-sm'>
+            {props.user.UserInformation.displayName ??
+              props.user.UserAuth.username}
+          </span>
+        </div>
+      </Link>
       <div className='flex gap-x-4'>
         <DeviceBindDialog refetch={props.refetchDevices} />
         <Button variant={'secondary'} onClick={handleLogout} title='Logout'>

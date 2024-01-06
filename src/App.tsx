@@ -9,6 +9,7 @@ import Login from '@/routes/Login';
 import Register from '@/routes/Register';
 import Main from '@/routes/Main';
 import Device from '@/routes/Device';
+import Profile from './routes/Profile';
 
 export default function App() {
   const { data: user, isLoading, refetch } = useUser();
@@ -44,6 +45,10 @@ function RoutesWithUser(props: RoutesWithUserProps) {
             element={<Main user={props.user} refetch={props.refetch} />}
           />
           <Route path='/login' element={<Navigate to={'/'} />} />
+          <Route
+            path='/profile'
+            element={<Profile user={props.user} refetch={props.refetch} />}
+          />
           <Route path='/device/:id' element={<Device />} />
         </Routes>
       </BrowserRouter>
