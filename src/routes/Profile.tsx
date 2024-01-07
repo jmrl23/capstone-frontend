@@ -84,10 +84,7 @@ export default function Profile({ user, refetch }: Props) {
               <hr className='my-6' />
               <div className='flex justify-center gap-4 flex-wrap'>
                 <AvatarUpdate refetch={refetch} haxValue={hax.value} />
-                <Button title='Update password' variant={'secondary'}>
-                  <KeyIcon className='w-4 h-4 mr-2' />
-                  Update password
-                </Button>
+                <PasswordUpdate haxValue={hax.value} />
                 <NameUpdate
                   user={user}
                   haxValue={hax.value}
@@ -99,6 +96,107 @@ export default function Profile({ user, refetch }: Props) {
         </div>
       </main>
     </Container>
+  );
+}
+
+const passwordUpdateSchema = z.object({
+  old_password: z
+    .string()
+    .min(1, 'Old password must contain at least 1 character(s)'),
+  password: z
+    .string()
+    .min(1, 'New password must contain at least 1 character(s)'),
+});
+
+function PasswordUpdate({ haxValue }: { haxValue: Record<string, string> }) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const form = useForm<z.infer<typeof passwordUpdateSchema>>({
+    resolver: zodResolver(passwordUpdateSchema),
+    defaultValues: {
+      old_password: '',
+      password: '',
+    },
+  });
+  const onSubmit = async (formData: z.infer<typeof passwordUpdateSchema>) => {
+    const loadingToast = toast.loading('Updating password..');
+    const data = await request<{ user: User }>(
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/user/update`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...haxValue,
+        },
+        body: JSON.stringify(formData),
+      }),
+    );
+
+    toast.dismiss(loadingToast);
+
+    if (data instanceof Error) {
+      return toast.error(data.message);
+    }
+
+    toast.success('Password updated!');
+    setIsOpen(false);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button title='Update password' variant={'secondary'}>
+          <KeyIcon className='w-4 h-4 mr-2' />
+          Update password
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogHeader>
+              <DialogTitle>Update password</DialogTitle>
+              <DialogDescription>
+                Change your account's password
+              </DialogDescription>
+            </DialogHeader>
+            <FormField
+              name='old_password'
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormLabel>Current password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type='password' />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name='password'
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormLabel>New password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type='password' />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <DialogFooter className='gap-x-4 gap-y-2 mt-2'>
+              <Button type='submit'>Confirm</Button>
+              <Button
+                type='button'
+                variant={'secondary'}
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
