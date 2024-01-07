@@ -76,7 +76,7 @@ export default function Profile({ user, refetch }: Props) {
                   <p className='font-extrabold text-xl text-center'>
                     {user.UserInformation.displayName ?? user.UserAuth.username}
                   </p>
-                  <p className='text-sm mt-2'>
+                  <p className='text-sm mt-2 text-center'>
                     Joined {moment(user.createdAt).format('MMM YYYY')}
                   </p>
                 </div>
