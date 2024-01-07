@@ -6,6 +6,13 @@ import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon } from 'lucide-react';
 import { default as moment } from 'moment';
+import { useContext, useEffect, useState } from 'react';
+import { WsContext } from '@/contexts/ws';
+import { MqttTopics } from '@/lib/constants';
+import { subDays } from 'date-fns';
+import { DateRange } from 'react-day-picker';
+import { DatePickerWithRange } from '@/components/ui/date-range';
+import { useDeviceDataPressList } from '@/hooks/useDeviceDataPressList';
 import {
   Bar,
   ResponsiveContainer,
@@ -16,9 +23,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { useContext, useEffect, useState } from 'react';
-import { WsContext } from '@/contexts/ws';
-import { MqttTopics } from '@/lib/constants';
 import {
   Card,
   CardContent,
@@ -26,10 +30,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { subDays } from 'date-fns';
-import { DateRange } from 'react-day-picker';
-import { DatePickerWithRange } from '@/components/ui/date-range';
-import { useDeviceDataPressList } from '@/hooks/useDeviceDataPressList';
 import {
   Table,
   TableBody,
@@ -64,7 +64,7 @@ export default function Device() {
   );
   const now = new Date();
   const [logsTableDate, setLogsTableDate] = useState<DateRange | undefined>({
-    from: subDays(now, 5),
+    from: subDays(now, 6),
     to: now,
   });
   const { data: logsTableData, refetch: refetchDeviceDataPressList } =
@@ -129,17 +129,17 @@ function UsageGraph({
     {
       fill: 'green',
       min: 0,
-      name: 'Mild',
+      label: 'Mild',
     },
     {
       fill: 'orange',
       min: 11,
-      name: 'Moderate',
+      label: 'Moderate',
     },
     {
       fill: 'red',
       min: 31,
-      name: 'Severe',
+      label: 'Severe',
     },
   ];
 
@@ -173,7 +173,7 @@ function UsageGraph({
                   className='w-4 h-4 rounded'
                   style={{ backgroundColor: e.fill }}
                 />
-                <span className='font-bold'>{e.name}</span>
+                <span className='font-bold'>{e.label}</span>
               </div>
             ))}
           </div>
@@ -226,7 +226,7 @@ function LogsTable({
           <CardTitle>Logs</CardTitle>
           <CardDescription>View usage log on a date range</CardDescription>
         </CardHeader>
-        <DatePickerWithRange className='m-4' date={date} setDate={setDate} />
+        <DatePickerWithRange className='mx-4' date={date} setDate={setDate} />
         <p className='p-4 text-right font-bold text-gray-600 text-xs'>
           Total: {data.length}
         </p>
@@ -243,7 +243,9 @@ function LogsTable({
                 <TableCell>
                   {moment(press.createdAt).format('MMM DD, YYYY')}
                 </TableCell>
-                <TableCell>{moment(press.createdAt).format('HH:MM')}</TableCell>
+                <TableCell>
+                  {moment(press.createdAt).format('hh:mm A')}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
