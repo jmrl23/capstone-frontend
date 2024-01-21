@@ -73,7 +73,7 @@ export default function Profile({ user, refetch }: Props) {
               </div>
               <div className='h-[100px] flex items-end justify-center mt-6'>
                 <div>
-                  <p className='font-extrabold text-xl text-center'>
+                  <p className='font-extrabold text-xl text-center line-clamp-1 max-w-[360px]'>
                     {user.UserInformation.displayName ?? user.UserAuth.username}
                   </p>
                   <p className='text-sm mt-2 text-center'>

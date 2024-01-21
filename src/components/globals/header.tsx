@@ -40,7 +40,7 @@ export default function Header(props: Props) {
               {props.user.UserAuth.username.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className='font-extrabold text-sm'>
+          <span className='font-extrabold text-sm line-clamp-1'>
             {props.user.UserInformation.displayName ??
               props.user.UserAuth.username}
           </span>
