@@ -32,7 +32,10 @@ export function useDeviceDataPressList(
   const devices = data instanceof Error ? [] : data?.list ?? [];
 
   return {
-    data: devices,
+    data: devices.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ),
     isLoading,
     refetch,
     isFetching,
