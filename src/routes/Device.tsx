@@ -69,7 +69,8 @@ export default function Device() {
   });
   const { data: logsTableData, refetch: refetchDeviceDataPressList } =
     useDeviceDataPressList(
-      device?.id ?? '123e4567-e89b-12d3-a456-426614174000',
+      // just a placeholder UUID to prevent error 400 on request
+      device?.id ?? 'a2b56e25-6c01-4eb2-9b1b-66de8acbfda0',
       logsTableDate?.from?.toISOString(),
       logsTableDate?.to?.toISOString(),
     );
@@ -94,17 +95,25 @@ export default function Device() {
 
   return (
     <Container>
-      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4'>
-        <Link to='/'>
-          <Button variant='secondary'>
-            <ArrowLeftIcon />
-          </Button>
-        </Link>
-        <div>
-          <h3 className='font-extrabold text-lg'>Device Information</h3>
-          <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
-            {device.deviceKey}
+      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4 flex justify-between'>
+        <div className='flex items-center gap-x-4'>
+          <Link to='/'>
+            <Button variant='secondary'>
+              <ArrowLeftIcon />
+            </Button>
+          </Link>
+          <div>
+            <h3 className='font-extrabold text-lg'>Device Information</h3>
+            <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
+              {device.deviceKey}
+            </div>
           </div>
+        </div>
+        <div>
+          {/* TODO: Add modal */}
+          <Button variant={'outline'} title={`Last month's summary`}>
+            Last summary
+          </Button>
         </div>
       </header>
       <UsageGraph data={usageGraphData} />
@@ -125,6 +134,7 @@ function UsageGraph({
     total: number;
   }[];
 }) {
+  // TODO: Update massages
   const status = [
     {
       fill: 'green',
@@ -147,15 +157,15 @@ function UsageGraph({
   ];
 
   const getStatus = (n: number) => {
-    let _status = status[0];
+    let target = status[0];
 
     for (const s of status) {
       if (n >= s.min) {
-        _status = s;
+        target = s;
       }
     }
 
-    return _status;
+    return target;
   };
 
   const getStatusFill = (n: number): string => {
@@ -163,6 +173,8 @@ function UsageGraph({
 
     return fill;
   };
+
+  const [message, setMessage] = useState<string>('');
 
   return (
     <div className='m-4'>
@@ -209,7 +221,13 @@ function UsageGraph({
               <Bar
                 dataKey='total'
                 radius={[2, 2, 0, 0]}
-                onMouseEnter={(e) => console.log(e)}
+                onMouseEnter={(e) => {
+                  const message = getStatus(e.payload.total).message;
+                  setMessage(message);
+                }}
+                onMouseLeave={() => {
+                  setMessage('');
+                }}
               >
                 {data?.map(({ total, name }) => (
                   <Cell key={name} fill={getStatusFill(total)} />
@@ -218,6 +236,9 @@ function UsageGraph({
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
+        <p className='text-center px-4 pb-4 font-extrabold text-xs text-gray-600'>
+          {message || '—'}
+        </p>
       </Card>
     </div>
   );
@@ -253,7 +274,7 @@ function LogsTable({
               <TableHead>Time</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className='max-h-[400px] overflow-y-hidden'>
+          <TableBody>
             {selectedData.map((press) => (
               <TableRow key={press.id}>
                 <TableCell>
