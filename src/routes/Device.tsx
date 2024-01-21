@@ -4,7 +4,7 @@ import Container from '@/components/globals/container';
 import { useDevices } from '@/hooks/useDevices';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { default as moment } from 'moment';
 import { useContext, useEffect, useState } from 'react';
 import { WsContext } from '@/contexts/ws';
@@ -130,27 +130,36 @@ function UsageGraph({
       fill: 'green',
       min: 0,
       label: 'Mild',
+      message: 'your astma is mild',
     },
     {
       fill: 'orange',
       min: 11,
       label: 'Moderate',
+      message: 'your astma is moderate',
     },
     {
       fill: 'red',
       min: 31,
       label: 'Severe',
+      message: 'your astma is severe',
     },
   ];
 
-  const getStatusFill = (n: number): string => {
-    let fill = status[0].fill;
+  const getStatus = (n: number) => {
+    let _status = status[0];
 
-    for (const e of status) {
-      if (n >= e.min) {
-        fill = e.fill;
+    for (const s of status) {
+      if (n >= s.min) {
+        _status = s;
       }
     }
+
+    return _status;
+  };
+
+  const getStatusFill = (n: number): string => {
+    const fill = getStatus(n).fill;
 
     return fill;
   };
@@ -197,7 +206,11 @@ function UsageGraph({
                 tickFormatter={(value) => value}
               />
               <Tooltip />
-              <Bar dataKey='total' radius={[2, 2, 0, 0]}>
+              <Bar
+                dataKey='total'
+                radius={[2, 2, 0, 0]}
+                onMouseEnter={(e) => console.log(e)}
+              >
                 {data?.map(({ total, name }) => (
                   <Cell key={name} fill={getStatusFill(total)} />
                 ))}
@@ -219,12 +232,15 @@ function LogsTable({
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   data: DeviceDataPress[];
 }) {
+  const [pageIndex, setPageIndex] = useState<number>(0);
+  const selectedData = data.slice(pageIndex, pageIndex + 10);
+
   return (
     <div className='m-4'>
       <Card>
         <CardHeader>
           <CardTitle>Logs</CardTitle>
-          <CardDescription>View usage log on a date range</CardDescription>
+          <CardDescription>View usage logs on a date range</CardDescription>
         </CardHeader>
         <DatePickerWithRange className='mx-4' date={date} setDate={setDate} />
         <p className='p-4 text-right font-bold text-gray-600 text-xs'>
@@ -237,8 +253,8 @@ function LogsTable({
               <TableHead>Time</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {data.map((press) => (
+          <TableBody className='max-h-[400px] overflow-y-hidden'>
+            {selectedData.map((press) => (
               <TableRow key={press.id}>
                 <TableCell>
                   {moment(press.createdAt).format('MMM DD, YYYY')}
@@ -250,6 +266,28 @@ function LogsTable({
             ))}
           </TableBody>
         </Table>
+        <div className='flex gap-x-2 p-4 justify-end border border-top'>
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              if (pageIndex <= 0) return;
+              setPageIndex((value) => value - 10);
+            }}
+            title='Previous'
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              if (pageIndex + 10 >= data.length) return;
+              setPageIndex((value) => value + 10);
+            }}
+            title='Next'
+          >
+            <ChevronRightIcon />
+          </Button>
+        </div>
       </Card>
     </div>
   );
