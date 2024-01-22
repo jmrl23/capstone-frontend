@@ -38,6 +38,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export default function Device() {
   const params = useParams<{ id: string }>();
@@ -269,6 +277,8 @@ function UsageGraph({
 }
 
 function RecordSummary() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   return (
     <div className='m-4'>
       <Card>
@@ -277,11 +287,68 @@ function RecordSummary() {
           <CardDescription>Summary report for the last month</CardDescription>
         </CardHeader>
         <CardContent className='border-t'>
-          <div className='flex justify-end mt-6'>
-            <Button variant={'outline'} title='View report'>
-              View report
-            </Button>
-          </div>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <div className='flex justify-end mt-6'>
+              <DialogTrigger asChild>
+                <Button variant={'outline'} title='View report'>
+                  View report
+                </Button>
+              </DialogTrigger>
+            </div>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Summary</DialogTitle>
+                <DialogDescription>
+                  Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                  Unde, consectetur.
+                </DialogDescription>
+              </DialogHeader>
+              <div>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui
+                  autem nobis at fuga soluta veritatis repellendus odio, vitae
+                  quae ullam magni culpa voluptatum laboriosam quisquam
+                  provident similique nulla. Neque iste amet velit ex vero
+                  corporis id delectus inventore, omnis repellat.
+                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>a</TableHead>
+                      <TableHead>b</TableHead>
+                      <TableHead>c</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>data 1 a</TableCell>
+                      <TableCell>data 1 b</TableCell>
+                      <TableCell>data 1 c</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>data 2 a</TableCell>
+                      <TableCell>data 2 b</TableCell>
+                      <TableCell>data 2 c</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>data 3 a</TableCell>
+                      <TableCell>data 3 b</TableCell>
+                      <TableCell>data 3 c</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+                <div className='flex justify-end border-t pt-6'>
+                  <Button
+                    variant={'outline'}
+                    title='close'
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
@@ -308,10 +375,7 @@ function LogsTable({
           <CardDescription>View usage logs on a date range</CardDescription>
         </CardHeader>
         <DatePickerWithRange className='mx-4' date={date} setDate={setDate} />
-        <p className='p-4 text-right font-bold text-gray-600 text-xs'>
-          Total: {data.length}
-        </p>
-        <Table>
+        <Table className='border-t mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
@@ -332,6 +396,9 @@ function LogsTable({
           </TableBody>
         </Table>
         <div className='flex gap-x-2 p-4 justify-end border-t'>
+          <p className='p-4 text-right font-bold text-gray-600 text-xs'>
+            Total: {data.length}
+          </p>
           <Button
             variant={'outline'}
             onClick={() => {
