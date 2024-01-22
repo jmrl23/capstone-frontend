@@ -95,28 +95,21 @@ export default function Device() {
 
   return (
     <Container>
-      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4 flex justify-between'>
-        <div className='flex items-center gap-x-4'>
-          <Link to='/'>
-            <Button variant='secondary'>
-              <ArrowLeftIcon />
-            </Button>
-          </Link>
-          <div>
-            <h3 className='font-extrabold text-lg'>Device Information</h3>
-            <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
-              {device.deviceKey}
-            </div>
-          </div>
-        </div>
-        <div>
-          {/* TODO: Add modal */}
-          <Button variant={'outline'} title={`Last month's summary`}>
-            Last summary
+      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4'>
+        <Link to='/'>
+          <Button variant='secondary'>
+            <ArrowLeftIcon />
           </Button>
+        </Link>
+        <div>
+          <h3 className='font-extrabold text-lg'>Device Information</h3>
+          <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
+            {device.deviceKey}
+          </div>
         </div>
       </header>
       <UsageGraph data={usageGraphData} />
+      <RecordSummary />
       <LogsTable
         date={logsTableDate}
         setDate={setLogsTableDate}
@@ -134,25 +127,44 @@ function UsageGraph({
     total: number;
   }[];
 }) {
-  // TODO: Update massages
   const status = [
     {
       fill: 'green',
       min: 0,
       label: 'Mild',
-      message: 'your astma is mild',
+      message: (
+        <>
+          Use a rescue inhaler as needed and consider a low-dose inhaled
+          corticosteroid, working with your healthcare provider to create an
+          asthma action plan.
+        </>
+      ),
     },
     {
       fill: 'orange',
       min: 11,
       label: 'Moderate',
-      message: 'your astma is moderate',
+      message: (
+        <>
+          Combine a rescue inhaler with daily inhaled corticosteroids, and
+          follow your action plan for symptom management, monitoring symptoms
+          and peak flow as directed.
+        </>
+      ),
     },
     {
       fill: 'red',
       min: 31,
       label: 'Severe',
-      message: 'your astma is severe',
+      message: (
+        <>
+          Combine quick-acting bronchodilators with high-dose inhaled
+          corticosteroids and possibly other medications; regularly monitor
+          symptoms, perform lung function tests, and work closely with a
+          specialist to adjust your treatment plan, following your personalized
+          asthma action plan for effective management.
+        </>
+      ),
     },
   ];
 
@@ -174,7 +186,13 @@ function UsageGraph({
     return fill;
   };
 
-  const [message, setMessage] = useState<string>('');
+  const [targetStatus, setTargetStatus] = useState<{
+    fill: string;
+    min: number;
+    label: string;
+    message: React.ReactNode;
+    name: string;
+  } | null>(null);
 
   return (
     <div className='m-4'>
@@ -221,12 +239,12 @@ function UsageGraph({
               <Bar
                 dataKey='total'
                 radius={[2, 2, 0, 0]}
-                onMouseEnter={(e) => {
-                  const message = getStatus(e.payload.total).message;
-                  setMessage(message);
+                onClick={(e) => {
+                  const status = getStatus(e.payload.total);
+                  setTargetStatus({ ...status, name: e.name });
                 }}
-                onMouseLeave={() => {
-                  setMessage('');
+                onBlur={() => {
+                  setTargetStatus(null);
                 }}
               >
                 {data?.map(({ total, name }) => (
@@ -236,9 +254,35 @@ function UsageGraph({
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
-        <p className='text-center px-4 pb-4 font-extrabold text-xs text-gray-600'>
-          {message || '—'}
+        <p className='text-justify px-4 pb-4 text-xs text-gray-600'>
+          {!targetStatus && <span className='invisible'>—</span>}
+          {targetStatus && (
+            <>
+              <span className='font-extrabold'>{targetStatus.name}: </span>
+              <span>{targetStatus.message}</span>
+            </>
+          )}
         </p>
+      </Card>
+    </div>
+  );
+}
+
+function RecordSummary() {
+  return (
+    <div className='m-4'>
+      <Card>
+        <CardHeader>
+          <CardTitle>Summary</CardTitle>
+          <CardDescription>Summary report for the last month</CardDescription>
+        </CardHeader>
+        <CardContent className='border-t'>
+          <div className='flex justify-end mt-6'>
+            <Button variant={'outline'} title='View report'>
+              View report
+            </Button>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );
@@ -287,7 +331,7 @@ function LogsTable({
             ))}
           </TableBody>
         </Table>
-        <div className='flex gap-x-2 p-4 justify-end border border-top'>
+        <div className='flex gap-x-2 p-4 justify-end border-t'>
           <Button
             variant={'outline'}
             onClick={() => {
