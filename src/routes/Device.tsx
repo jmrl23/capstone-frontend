@@ -83,59 +83,7 @@ export default function Device() {
       logsTableDate?.to?.toISOString(),
     );
 
-  useEffect(() => {
-    const callback = (data: MqttMessage) => {
-      if (data.topic.parsed === MqttTopics.A_SYNC) {
-        refetch();
-        refetchDeviceDataPressList();
-        return;
-      }
-    };
-
-    socket?.on('mqtt:message', callback);
-    return () => {
-      socket?.off('mqtt:message', callback);
-    };
-  }, [refetch, refetchDeviceDataPressList, socket]);
-
-  if (isLoading) return <Loading />;
-  if (!device) return <NotFound />;
-
-  return (
-    <Container>
-      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4'>
-        <Link to='/'>
-          <Button variant='secondary'>
-            <ArrowLeftIcon />
-          </Button>
-        </Link>
-        <div>
-          <h3 className='font-extrabold text-lg'>Device Information</h3>
-          <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
-            {device.deviceKey}
-          </div>
-        </div>
-      </header>
-      <UsageGraph data={usageGraphData} />
-      <RecordSummary />
-      <LogsTable
-        date={logsTableDate}
-        setDate={setLogsTableDate}
-        data={logsTableData}
-      />
-    </Container>
-  );
-}
-
-function UsageGraph({
-  data,
-}: {
-  data?: {
-    name: string;
-    total: number;
-  }[];
-}) {
-  const status = [
+  const severities: Severity[] = [
     {
       fill: 'green',
       min: 0,
@@ -176,10 +124,10 @@ function UsageGraph({
     },
   ];
 
-  const getStatus = (n: number) => {
-    let target = status[0];
+  const getSeverity = (n: number) => {
+    let target = severities[0];
 
-    for (const s of status) {
+    for (const s of severities) {
       if (n >= s.min) {
         target = s;
       }
@@ -188,19 +136,75 @@ function UsageGraph({
     return target;
   };
 
-  const getStatusFill = (n: number): string => {
-    const fill = getStatus(n).fill;
+  useEffect(() => {
+    const callback = (data: MqttMessage) => {
+      if (data.topic.parsed === MqttTopics.A_SYNC) {
+        refetch();
+        refetchDeviceDataPressList();
+        return;
+      }
+    };
+
+    socket?.on('mqtt:message', callback);
+    return () => {
+      socket?.off('mqtt:message', callback);
+    };
+  }, [refetch, refetchDeviceDataPressList, socket]);
+
+  if (isLoading) return <Loading />;
+  if (!device) return <NotFound />;
+
+  return (
+    <Container>
+      <header className='p-4 bg-primary-foreground flex items-center shadow gap-x-4 rounded-b-lg mx-4'>
+        <Link to='/'>
+          <Button variant='secondary'>
+            <ArrowLeftIcon />
+          </Button>
+        </Link>
+        <div>
+          <h3 className='font-extrabold text-lg'>Device Information</h3>
+          <div className='text-muted-foreground ml-auto font-mono font-bold text-xs'>
+            {device.deviceKey}
+          </div>
+        </div>
+      </header>
+      <UsageGraph
+        data={usageGraphData}
+        severities={severities}
+        getSeverity={getSeverity}
+      />
+      <RecordSummary data={usageGraphData?.at(-1)} getSeverity={getSeverity} />
+      <LogsTable
+        date={logsTableDate}
+        setDate={setLogsTableDate}
+        data={logsTableData}
+      />
+    </Container>
+  );
+}
+
+function UsageGraph({
+  data,
+  severities,
+  getSeverity,
+}: {
+  data?: {
+    name: string;
+    total: number;
+  }[];
+  severities: Severity[];
+  getSeverity: (n: number) => Severity;
+}) {
+  const getSeverityColor = (n: number): string => {
+    const fill = getSeverity(n).fill;
 
     return fill;
   };
 
-  const [targetStatus, setTargetStatus] = useState<{
-    fill: string;
-    min: number;
-    label: string;
-    message: React.ReactNode;
-    name: string;
-  } | null>(null);
+  const [targetStatus, setTargetStatus] = useState<
+    (Severity & { name: string }) | null
+  >(null);
 
   return (
     <div className='m-4'>
@@ -211,7 +215,7 @@ function UsageGraph({
             Number of presses for the last 5 months
           </CardDescription>
           <div className='flex flex-col gap-y-2 pt-4 text-xs text-gray-600 items-end'>
-            {status.map((e, i) => (
+            {severities.map((e, i) => (
               <div
                 className='flex gap-x-2 justify-between items-center w-[80px]'
                 key={i}
@@ -248,15 +252,15 @@ function UsageGraph({
                 dataKey='total'
                 radius={[2, 2, 0, 0]}
                 onClick={(e) => {
-                  const status = getStatus(e.payload.total);
-                  setTargetStatus({ ...status, name: e.name });
+                  const severity = getSeverity(e.payload.total);
+                  setTargetStatus({ ...severity, name: e.name });
                 }}
                 onBlur={() => {
                   setTargetStatus(null);
                 }}
               >
                 {data?.map(({ total, name }) => (
-                  <Cell key={name} fill={getStatusFill(total)} />
+                  <Cell key={name} fill={getSeverityColor(total)} />
                 ))}
               </Bar>
             </BarChart>
@@ -276,67 +280,69 @@ function UsageGraph({
   );
 }
 
-function RecordSummary() {
+export interface Severity {
+  fill: string;
+  min: number;
+  label: string;
+  message: JSX.Element;
+}
+
+function RecordSummary({
+  data,
+  getSeverity,
+}: {
+  data?: { name: string; total: number };
+  getSeverity: (n: number) => Severity;
+}) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const summaryMessage = (data?: {
+    name: string;
+    total: number;
+  }): string | null => {
+    if (!data) return null;
+
+    const label = getSeverity(data.total).label;
+
+    if (label === 'Mild') {
+      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, indicating a "Mild" level of asthma. Continue with your regular medication routine, and remember upcoming doctor appointments for comprehensive care. Your progress is positive; prioritize your health throughout the month!`;
+    }
+
+    if (label === 'Moderate') {
+      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, indicating a "Moderate" level of asthma. It's essential to maintain your consistent medication routine, and please remember your upcoming doctor appointments for comprehensive care. Keep track of your progress, and prioritize your health throughout the month!`;
+    }
+
+    if (label === 'Severe') {
+      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, reflecting a "Severe" level of asthma. Urgently adhere to your medication routine, and ensure timely doctor appointments for comprehensive care. Monitoring your health closely is crucial during this period. Prioritize your well-being throughout the month!`;
+    }
+
+    return null;
+  };
 
   return (
     <div className='m-4'>
       <Card>
         <CardHeader>
           <CardTitle>Summary</CardTitle>
-          <CardDescription>Summary report for the last month</CardDescription>
+          <CardDescription>
+            Recommendation action based on your usage
+          </CardDescription>
         </CardHeader>
         <CardContent className='border-t'>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <div className='flex justify-end mt-6'>
               <DialogTrigger asChild>
                 <Button variant={'outline'} title='View report'>
-                  View report
+                  View
                 </Button>
               </DialogTrigger>
             </div>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Summary</DialogTitle>
-                <DialogDescription>
-                  Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                  Unde, consectetur.
-                </DialogDescription>
+                <DialogDescription>Recommendation</DialogDescription>
               </DialogHeader>
               <div>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui
-                  autem nobis at fuga soluta veritatis repellendus odio, vitae
-                  quae ullam magni culpa voluptatum laboriosam quisquam
-                  provident similique nulla. Neque iste amet velit ex vero
-                  corporis id delectus inventore, omnis repellat.
-                </p>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>a</TableHead>
-                      <TableHead>b</TableHead>
-                      <TableHead>c</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>data 1 a</TableCell>
-                      <TableCell>data 1 b</TableCell>
-                      <TableCell>data 1 c</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>data 2 a</TableCell>
-                      <TableCell>data 2 b</TableCell>
-                      <TableCell>data 2 c</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>data 3 a</TableCell>
-                      <TableCell>data 3 b</TableCell>
-                      <TableCell>data 3 c</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <p>{summaryMessage(data)}</p>
                 <div className='flex justify-end border-t pt-6'>
                   <Button
                     variant={'outline'}
