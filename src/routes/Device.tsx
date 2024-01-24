@@ -44,7 +44,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 
 export default function Device() {
@@ -88,39 +87,16 @@ export default function Device() {
       fill: 'green',
       min: 0,
       label: 'Mild',
-      message: (
-        <>
-          Use a rescue inhaler as needed and consider a low-dose inhaled
-          corticosteroid, working with your healthcare provider to create an
-          asthma action plan.
-        </>
-      ),
     },
     {
       fill: 'orange',
       min: 11,
       label: 'Moderate',
-      message: (
-        <>
-          Combine a rescue inhaler with daily inhaled corticosteroids, and
-          follow your action plan for symptom management, monitoring symptoms
-          and peak flow as directed.
-        </>
-      ),
     },
     {
       fill: 'red',
       min: 31,
       label: 'Severe',
-      message: (
-        <>
-          Combine quick-acting bronchodilators with high-dose inhaled
-          corticosteroids and possibly other medications; regularly monitor
-          symptoms, perform lung function tests, and work closely with a
-          specialist to adjust your treatment plan, following your personalized
-          asthma action plan for effective management.
-        </>
-      ),
     },
   ];
 
@@ -174,7 +150,7 @@ export default function Device() {
         severities={severities}
         getSeverity={getSeverity}
       />
-      <RecordSummary data={usageGraphData?.at(-1)} getSeverity={getSeverity} />
+      {/* <RecordSummary data={usageGraphData?.at(-1)} getSeverity={getSeverity} /> */}
       <LogsTable
         date={logsTableDate}
         setDate={setLogsTableDate}
@@ -196,6 +172,49 @@ function UsageGraph({
   severities: Severity[];
   getSeverity: (n: number) => Severity;
 }) {
+  const getMessage = (
+    severity: Severity | null,
+    month?: string,
+    total?: number,
+  ): JSX.Element | null => {
+    if (!severity) return null;
+
+    switch (severity.label) {
+      case 'Mild':
+        return (
+          <>
+            In the month of {month}, you've used the inhaler {total} times,
+            indicating a "Mild" level of asthma. Continue with your regular
+            medication routine, and remember upcoming doctor appointments for
+            comprehensive care. Your progress is positive; prioritize your
+            health throughout the month!
+          </>
+        );
+
+      case 'Moderate':
+        return (
+          <>
+            In the month of {month}, you've used the inhaler {total} times,
+            indicating a "Moderate" level of asthma. It's essential to maintain
+            your consistent medication routine, and please remember your
+            upcoming doctor appointments for comprehensive care. Keep track of
+            your progress, and prioritize your health throughout the month!
+          </>
+        );
+
+      case 'Severe':
+        return (
+          <>
+            In the month of {month}, you've used the inhaler {total} times,
+            reflecting a "Severe" level of asthma. Urgently adhere to your
+            medication routine, and ensure timely doctor appointments for
+            comprehensive care. Monitoring your health closely is crucial during
+            this period. Prioritize your well-being throughout the month!
+          </>
+        );
+    }
+  };
+
   const getSeverityColor = (n: number): string => {
     const fill = getSeverity(n).fill;
 
@@ -205,6 +224,12 @@ function UsageGraph({
   const [targetStatus, setTargetStatus] = useState<
     (Severity & { name: string }) | null
   >(null);
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsOpen(targetStatus !== null);
+  }, [targetStatus]);
 
   return (
     <div className='m-4'>
@@ -265,93 +290,29 @@ function UsageGraph({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
-        <p className='text-justify px-4 pb-4 text-xs text-gray-600'>
-          {!targetStatus && <span className='invisible'>—</span>}
-          {targetStatus && (
-            <>
-              <span className='font-extrabold'>{targetStatus.name}: </span>
-              <span>{targetStatus.message}</span>
-            </>
-          )}
-        </p>
-      </Card>
-    </div>
-  );
-}
-
-export interface Severity {
-  fill: string;
-  min: number;
-  label: string;
-  message: JSX.Element;
-}
-
-function RecordSummary({
-  data,
-  getSeverity,
-}: {
-  data?: { name: string; total: number };
-  getSeverity: (n: number) => Severity;
-}) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const summaryMessage = (data?: {
-    name: string;
-    total: number;
-  }): string | null => {
-    if (!data) return null;
-
-    const label = getSeverity(data.total).label;
-
-    if (label === 'Mild') {
-      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, indicating a "Mild" level of asthma. Continue with your regular medication routine, and remember upcoming doctor appointments for comprehensive care. Your progress is positive; prioritize your health throughout the month!`;
-    }
-
-    if (label === 'Moderate') {
-      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, indicating a "Moderate" level of asthma. It's essential to maintain your consistent medication routine, and please remember your upcoming doctor appointments for comprehensive care. Keep track of your progress, and prioritize your health throughout the month!`;
-    }
-
-    if (label === 'Severe') {
-      return `In the month of ${data.name}, you've used the inhaler ${data.total} times, reflecting a "Severe" level of asthma. Urgently adhere to your medication routine, and ensure timely doctor appointments for comprehensive care. Monitoring your health closely is crucial during this period. Prioritize your well-being throughout the month!`;
-    }
-
-    return null;
-  };
-
-  return (
-    <div className='m-4'>
-      <Card>
-        <CardHeader>
-          <CardTitle>Summary</CardTitle>
-          <CardDescription>
-            Recommendation action based on your usage
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='border-t'>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <div className='flex justify-end mt-6'>
-              <DialogTrigger asChild>
-                <Button variant={'outline'} title='View report'>
-                  View
-                </Button>
-              </DialogTrigger>
-            </div>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Summary</DialogTitle>
-                <DialogDescription>Recommendation</DialogDescription>
+                <DialogDescription>
+                  Recommendation for the month of {targetStatus?.name}
+                </DialogDescription>
               </DialogHeader>
               <div>
-                <p>{summaryMessage(data)}</p>
-                <div className='flex justify-end border-t pt-6'>
-                  <Button
-                    variant={'outline'}
-                    title='close'
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Close
-                  </Button>
-                </div>
+                {getMessage(
+                  targetStatus,
+                  targetStatus?.name,
+                  data?.find((e) => e.name === targetStatus?.name)?.total,
+                )}
+              </div>
+              <div className='flex justify-end border-t pt-6'>
+                <Button
+                  variant={'outline'}
+                  title='close'
+                  onClick={() => setIsOpen(false)}
+                >
+                  Close
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
