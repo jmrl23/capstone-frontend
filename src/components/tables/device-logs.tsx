@@ -103,7 +103,7 @@ export default function DeviceLogsTable({ device }: Props) {
             </TableBody>
           </Table>
         )}
-        <div className='flex gap-x-2 p-4 justify-end border-t'>
+        <div className='flex gap-x-2 p-4 pb-2 justify-end border-t'>
           <p className='p-4 text-right font-bold text-gray-600 text-xs'>
             Total: {data.length}
           </p>
