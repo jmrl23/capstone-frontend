@@ -22,7 +22,7 @@ export default defineConfig(() => {
           enabled: true,
         },
         manifest: {
-          name: 'IoT Inhaler Alert System',
+          name: 'IoT Inhaler System',
           short_name: 'IoT Inhaler',
           description: 'Capstone project',
           theme_color: '#ffffff',
