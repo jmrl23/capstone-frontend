@@ -30,3 +30,60 @@ export enum NavigationContents {
   learn,
   devices,
 }
+
+export const medications: Array<{ name: string; actuations: number[] }> = [
+  {
+    name: 'Advair Diskus',
+    actuations: [60],
+  },
+  {
+    name: 'Symbicort Inhaler',
+    actuations: [120, 160],
+  },
+  {
+    name: 'QVAR Inhaler',
+    actuations: [200],
+  },
+  {
+    name: 'Ventolin (Albuterol)',
+    actuations: [200],
+  },
+  {
+    name: 'ProAir (Albuterol)',
+    actuations: [200],
+  },
+  {
+    name: 'Xopenex (Levalbuterol)',
+    actuations: [200],
+  },
+  {
+    name: 'Flovent HFA Inhaler',
+    actuations: [120, 240],
+  },
+];
+
+export const levels: Array<{
+  color: string;
+  max: number;
+}> = [
+  {
+    color: 'green',
+    max: 60,
+  },
+  {
+    color: 'blue',
+    max: 120,
+  },
+  {
+    color: 'yellow',
+    max: 160,
+  },
+  {
+    color: 'orange',
+    max: 200,
+  },
+  {
+    color: 'red',
+    max: 240,
+  },
+];

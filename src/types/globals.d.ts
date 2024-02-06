@@ -41,10 +41,4 @@ export declare global {
     };
     device: Device;
   }
-
-  export declare interface Severity {
-    fill: string;
-    min: number;
-    label: 'Mild' | 'Moderate' | 'Severe';
-  }
 }
