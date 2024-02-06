@@ -64,26 +64,26 @@ export const medications: Array<{ name: string; actuations: number[] }> = [
 
 export const levels: Array<{
   color: string;
-  max: number;
+  min: number;
 }> = [
   {
     color: 'green',
-    max: 60,
+    min: 0,
   },
   {
     color: 'blue',
-    max: 120,
+    min: 61,
   },
   {
     color: 'yellow',
-    max: 160,
+    min: 121,
   },
   {
     color: 'orange',
-    max: 200,
+    min: 161,
   },
   {
     color: 'red',
-    max: 240,
+    min: 201,
   },
 ];

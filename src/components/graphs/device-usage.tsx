@@ -16,10 +16,11 @@ import {
   YAxis,
 } from 'recharts';
 import { MqttTopics, levels } from '@/lib/constants';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { WsContext } from '@/contexts/ws';
-import moment from 'moment';
 import { CircleSlashIcon } from 'lucide-react';
+import moment from 'moment';
+import SummaryDialog from '../dialogs/summary';
 
 export default function DeviceUsageGraph({ device, refetch }: Props) {
   const data: Array<{ name: string; total: number }> =
@@ -43,7 +44,7 @@ export default function DeviceUsageGraph({ device, refetch }: Props) {
     let selected = levels[0];
 
     for (const level of levels) {
-      if (value >= level.max) {
+      if (value >= level.min) {
         selected = level;
       }
     }
@@ -52,6 +53,12 @@ export default function DeviceUsageGraph({ device, refetch }: Props) {
   };
 
   const socket = useContext(WsContext);
+  const [selectedData, setSelectedData] = useState<{
+    name: string;
+    total: number;
+  } | null>(null);
+  const [summaryDialogIsOpen, setSummaryDialogIsOpen] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const callback = (data: MqttMessage) => {
@@ -66,6 +73,10 @@ export default function DeviceUsageGraph({ device, refetch }: Props) {
       socket?.off('mqtt:message', callback);
     };
   }, [refetch, socket]);
+
+  useEffect(() => {
+    setSummaryDialogIsOpen(selectedData !== null);
+  }, [selectedData]);
 
   return (
     <div className='m-4'>
@@ -102,14 +113,30 @@ export default function DeviceUsageGraph({ device, refetch }: Props) {
                   tickFormatter={(value) => value}
                 />
                 <Tooltip />
-                <Bar dataKey='total' radius={[2, 2, 0, 0]}>
-                  {data?.map(({ total, name }) => (
-                    <Cell key={name} fill={getLevel(total).color} />
+                <Bar
+                  dataKey='total'
+                  radius={[2, 2, 0, 0]}
+                  onClick={(e) => {
+                    setSelectedData({
+                      name: e.name,
+                      total: e.total,
+                    });
+                  }}
+                  onBlur={() => setSelectedData(null)}
+                >
+                  {data?.map((data) => (
+                    <Cell key={data.name} fill={getLevel(data.total).color} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           )}
+
+          <SummaryDialog
+            data={selectedData}
+            isOpen={summaryDialogIsOpen}
+            onOpenChange={setSummaryDialogIsOpen}
+          />
         </CardContent>
       </Card>
     </div>
