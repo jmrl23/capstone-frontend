@@ -1,5 +1,10 @@
 import { subDays } from 'date-fns';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CircleSlashIcon,
+  Loader2Icon,
+} from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,11 +70,18 @@ export default function DeviceLogsTable({ device }: Props) {
         </CardHeader>
         <DatePickerWithRange className='mx-4' date={date} setDate={setDate} />
         {isLoading && (
-          <p className='p-4 font-bold text-sm text-muted-foreground'>
-            Loading..
+          <p className='text-sm text-muted-foreground font-bold p-4'>
+            <Loader2Icon className='animate-spin inline-block' />
+            <span className='inline-block ml-2'>Loading..</span>
           </p>
         )}
-        {!isLoading && (
+        {!isLoading && selectedData.length < 1 && (
+          <p className='text-sm text-muted-foreground font-bold p-4'>
+            <CircleSlashIcon className='inline-block mr-2' />
+            Not available
+          </p>
+        )}
+        {!isLoading && selectedData.length > 0 && (
           <Table className='border-t mt-4'>
             <TableHeader>
               <TableRow>

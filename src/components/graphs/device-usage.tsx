@@ -19,6 +19,7 @@ import { MqttTopics, levels } from '@/lib/constants';
 import { useContext, useEffect } from 'react';
 import { WsContext } from '@/contexts/ws';
 import moment from 'moment';
+import { CircleSlashIcon } from 'lucide-react';
 
 export default function DeviceUsageGraph({ device, refetch }: Props) {
   const data: Array<{ name: string; total: number }> =
@@ -76,31 +77,39 @@ export default function DeviceUsageGraph({ device, refetch }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width='100%' height={250}>
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis
-                dataKey='name'
-                className='stroke-muted-foreground'
-                fontSize={12}
-                tickLine={false}
-                axisLine={true}
-              />
-              <YAxis
-                className='stroke-muted-foreground'
-                fontSize={12}
-                tickLine={true}
-                axisLine={true}
-                tickFormatter={(value) => value}
-              />
-              <Tooltip />
-              <Bar dataKey='total' radius={[2, 2, 0, 0]}>
-                {data?.map(({ total, name }) => (
-                  <Cell key={name} fill={getLevel(total).color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          {data.length < 1 && (
+            <p className='text-sm text-muted-foreground font-bold'>
+              <CircleSlashIcon className='inline-block mr-2' />
+              Not available
+            </p>
+          )}
+          {data.length > 1 && (
+            <ResponsiveContainer width='100%' height={250}>
+              <BarChart data={data}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis
+                  dataKey='name'
+                  className='stroke-muted-foreground'
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={true}
+                />
+                <YAxis
+                  className='stroke-muted-foreground'
+                  fontSize={12}
+                  tickLine={true}
+                  axisLine={true}
+                  tickFormatter={(value) => value}
+                />
+                <Tooltip />
+                <Bar dataKey='total' radius={[2, 2, 0, 0]}>
+                  {data?.map(({ total, name }) => (
+                    <Cell key={name} fill={getLevel(total).color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -7,6 +7,7 @@ import NotFound from '@/routes/Notfound';
 import Container from '@/components/globals/container';
 import DeviceUsageGraph from '@/components/graphs/device-usage';
 import DeviceLogsTable from '@/components/tables/device-logs';
+import MedicationsTable from '@/components/tables/medications';
 
 export default function Device() {
   const params = useParams<{ id: string }>();
@@ -32,6 +33,7 @@ export default function Device() {
         </div>
       </header>
       <DeviceUsageGraph device={device} refetch={refetchDevice} />
+      <MedicationsTable />
       <DeviceLogsTable device={device} />
     </Container>
   );
